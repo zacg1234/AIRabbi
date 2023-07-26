@@ -3,7 +3,7 @@ import os
 import json
 import openai
 
-from config import API_KEY, ORG_ID
+from config import ORG_ID
 from oruch_chaim_sections import CATEGORIES_LIST
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
@@ -17,7 +17,7 @@ def get_completion(prompt, model="gpt-3.5-turbo"):
 
 
 openai.organization = ORG_ID
-openai.api_key = API_KEY
+openai.api_key = os.environ["OPENAI_API_KEY"]
 #openai.Model.list()
 
 MODEL = "gpt-3.5-turbo"
@@ -57,4 +57,4 @@ if len(json_response["title"]) > 0 :
     print(json_response["number"], " : ", json_response["title"] )
 
 else :
-    print("Uh oh, this isnt geshmak, I dont have a teshuva to your shaila, sorry.")
+    print("Uh oh! this isn't geshmak, I dont have a teshuva to your shaila, sorry.")
