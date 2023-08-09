@@ -1,10 +1,13 @@
-#!/usr/bin/env python3
-import os
 import json
+import os
+
 import openai
 
 from config import ORG_ID
 from oruch_chaim_sections import CATEGORIES_LIST
+from sifim import simanim_dict
+from endpoint import GetSefariaAPI
+
 
 def get_completion(prompt, model="gpt-3.5-turbo"):
     messages = [{"role": "user", "content": prompt}]
@@ -22,8 +25,8 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 
 MODEL = "gpt-3.5-turbo"
 
-#question = "If I am eating a meal with three men, and one of them benches, am I stil obligated in zimun? "
-question = "If my wife is in niddah, am I allowed to touch her?"
+question = "If I am eating a meal with three men, and one of them benches, am I stil obligated in zimun? "
+#question = "If my wife is in niddah, am I allowed to touch her?"
 #question = "can I eat meat betwean rosh chodesh Av and the 9th of Av?"
 #question = "what blessing do I make on a lemon?"
 
@@ -49,12 +52,20 @@ Shulchan Aruch table of contents: <{categories}>
 """
     response = get_completion(prompt, MODEL)
     json_response = json.loads(response)
-    print("one attempt")
+    print("Loading...")
     if len(json_response["title"]) > 0 :
         break
 
-if len(json_response["title"]) > 0 :
+if len(json_response["title"]) > 0 :  # Successfully indetified the section
+    simanim = simanim_dict[json_response["number"]]
     print(json_response["number"], " : ", json_response["title"] )
+    data = GetSefariaAPI(str(simanim[0])) # get the first siman of the list of simanim
+    print(data["text"]) ## if text is empty then only hebrew is available 
+    for item in data["he"]:
+        print(item.encode('utf-8').decode('utf-8'))
+    print(data["sections"], " - ",  data["toSections"])
+##TODO: get the entire siman
+    print(simanim)
 
 else :
     print("Uh oh! this isn't geshmak, I dont have a teshuva to your shaila, sorry.")
